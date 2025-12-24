@@ -1,4 +1,4 @@
-package com.example.javaadmintemplate.controller;
+
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -7,6 +7,7 @@ import com.example.javaadmintemplate.entity.User;
 import com.example.javaadmintemplate.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -15,7 +16,7 @@ import java.util.List;
 /**
  * 用户控制器
  * RESTful风格API
- * 
+ *
  * @author example
  */
 @RestController
@@ -25,6 +26,9 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     /**
      * 获取用户列表（分页）
      * GET /api/users?page=1&size=10
@@ -33,10 +37,10 @@ public class UserController {
     public ResponseEntity<IPage<User>> getUserList(
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "10") Integer size) {
-        
+
         Page<User> userPage = new Page<>(page, size);
         IPage<User> userList = userService.page(userPage);
-        
+
         return ResponseEntity.ok(userList);
     }
 
@@ -59,6 +63,8 @@ public class UserController {
      */
     @PostMapping
     public ResponseEntity<User> createUser(@RequestBody User user) {
+        // 加密密码
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setCreateTime(LocalDateTime.now());
         user.setUpdateTime(LocalDateTime.now());
         userService.save(user);
