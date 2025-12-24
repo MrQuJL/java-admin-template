@@ -1,0 +1,28 @@
+# Spring Boot 主配置文件
+spring:
+  # 配置文件激活（默认使用开发环境）
+  profiles:
+    active: dev
+
+# 应用配置
+server:
+  port: 8080
+  servlet:
+    context-path: /admin
+
+# MyBatis Plus 配置
+mybatis-plus:
+  configuration:
+    # 开启下划线转驼峰
+    map-underscore-to-camel-case: true
+    # 日志配置
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  # Mapper XML文件位置
+  mapper-locations: classpath*:mapper/**/*.xml
+  # 实体类扫描路径
+  type-aliases-package: com.example.javaadmintemplate.entity
+
+# 日志配置
+logging:
+  level:
+    com.example.javaadmintemplate: debug
