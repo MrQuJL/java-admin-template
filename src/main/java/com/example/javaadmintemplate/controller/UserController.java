@@ -1,4 +1,4 @@
-
+package com.example.javaadmintemplate.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;

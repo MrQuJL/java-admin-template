@@ -2,11 +2,9 @@ com/example/javaadmintemplate/controller/AuthController.class
 com/example/javaadmintemplate/service/impl/UserServiceImpl.class
 com/example/javaadmintemplate/mapper/UserMapper.class
 com/example/javaadmintemplate/dto/LoginResponse.class
-com/example/javaadmintemplate/controller/UserController.class
 com/example/javaadmintemplate/config/SecurityConfig.class
 com/example/javaadmintemplate/service/UserService.class
 com/example/javaadmintemplate/JavaAdminTemplateApplication.class
-com/example/javaadmintemplate/config/RedisConfig.class
 com/example/javaadmintemplate/dto/LoginRequest.class
 com/example/javaadmintemplate/config/MyBatisPlusConfig.class
 com/example/javaadmintemplate/controller/TestController.class
