@@ -1,164 +1,175 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{common/layout :: layout(~{::title}, ~{::section})}">
+
 <head>
-    <meta charset="UTF-8">
-    <title>用户管理 - Java Admin Template</title>
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <style>
-        body {
-            padding-top: 60px;
-        }
-        .sidebar {
-            height: 100vh;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 250px;
-            padding-top: 60px;
-            background-color: #343a40;
-            color: white;
-        }
-        .sidebar a {
-            color: white;
-            text-decoration: none;
-            display: block;
-            padding: 10px 20px;
-        }
-        .sidebar a:hover {
-            background-color: #495057;
-        }
-        .content {
-            margin-left: 250px;
-            padding: 20px;
-        }
-    </style>
+    <title>用户管理 - Admin Pro</title>
 </head>
+
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">Java Admin Template</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">欢迎, Admin</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">退出</a>
-                    </li>
-                </ul>
+    <section>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h4 class="fw-bold mb-1">用户管理</h4>
+                <p class="text-muted small mb-0">管理系统用户信息与权限</p>
             </div>
+            <a href="/admin/users/add" class="btn btn-primary">
+                <i class="fa fa-plus me-1"></i> 新增用户
+            </a>
         </div>
-    </nav>
 
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <a href="/admin"><i class="fa fa-dashboard"></i> 仪表盘</a>
-        <a href="/admin/users"><i class="fa fa-users"></i> 用户管理</a>
-        <a href="#"><i class="fa fa-cog"></i> 系统设置</a>
-    </div>
-
-    <!-- Main Content -->
-    <div class="content">
-        <div class="container-fluid">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1 class="h3"><i class="fa fa-users"></i> 用户管理</h1>
-                <a href="/admin/users/add" class="btn btn-primary"><i class="fa fa-plus"></i> 新增用户</a>
-            </div>
-
-            <!-- User List Table -->
-            <div class="card">
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-hover">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th>ID</th>
-                                    <th>用户名</th>
-                                    <th>真实姓名</th>
-                                    <th>手机号码</th>
-                                    <th>邮箱</th>
-                                    <th>状态</th>
-                                    <th>创建时间</th>
-                                    <th>操作</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr th:each="user : ${userList.records}">
-                                    <td th:text="${user.id}"></td>
-                                    <td th:text="${user.username}"></td>
-                                    <td th:text="${user.realName}"></td>
-                                    <td th:text="${user.phone}"></td>
-                                    <td th:text="${user.email}"></td>
-                                    <td>
-                                        <span th:if="${user.status == 1}" class="badge bg-success">启用</span>
-                                        <span th:else class="badge bg-danger">禁用</span>
-                                    </td>
-                                    <td th:text="${user.createTime}"></td>
-                                    <td>
-                                        <a th:href="@{/users/edit/{id}(id=${user.id})}" class="btn btn-sm btn-info"><i class="fa fa-edit"></i> 编辑</a>
-                                        <button class="btn btn-sm btn-danger" th:attr="onclick='deleteUser(' + ${user.id} + ')'"><i class="fa fa-trash"></i> 删除</button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 py-3">
+                <form action="/admin/users" method="get" class="row g-2 align-items-center">
+                    <div class="col-auto">
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i
+                                    class="fa fa-search text-muted"></i></span>
+                            <input type="text" class="form-control border-start-0 bg-light" name="keyword"
+                                th:value="${keyword}" placeholder="搜索用户名/邮箱/姓名...">
+                        </div>
                     </div>
-
-                    <!-- Pagination -->
-                    <nav aria-label="Page navigation">
-                        <ul class="pagination justify-content-center">
-                            <li class="page-item" th:classappend="${userList.current == 1} ? 'disabled'">
-                                <a class="page-link" th:href="@{/admin/users(page=${userList.current - 1}, size=${userList.size})}" aria-label="Previous">
-                                    <span aria-hidden="true">&laquo;</span>
-                                </a>
-                            </li>
-                            <li class="page-item" th:each="i : ${#numbers.sequence(1, userList.pages)}" th:classappend="${i == userList.current} ? 'active'">
-                                <a class="page-link" th:href="@{/admin/users(page=${i}, size=${userList.size})}" th:text="${i}"></a>
-                            </li>
-                            <li class="page-item" th:classappend="${userList.current == userList.pages} ? 'disabled'">
-                                <a class="page-link" th:href="@{/admin/users(page=${userList.current + 1}, size=${userList.size})}" aria-label="Next">
-                                    <span aria-hidden="true">&raquo;</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </nav>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-secondary">搜索</button>
+                    </div>
+                    <div class="col-auto ms-auto" th:if="${keyword != null and keyword != ''}">
+                        <a href="/admin/users" class="btn btn-link text-decoration-none text-muted btn-sm">
+                            <i class="fa fa-times-circle"></i> 清除筛选
+                        </a>
+                    </div>
+                </form>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4">ID</th>
+                                <th>用户信息</th>
+                                <th>联系方式</th>
+                                <th>状态</th>
+                                <th>创建时间</th>
+                                <th class="text-end pe-4">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="user : ${page.records}">
+                                <td class="ps-4 text-muted" th:text="${user.id}">1</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-3 text-primary fw-bold"
+                                            style="width: 40px; height: 40px;">
+                                            <span
+                                                th:text="${#strings.substring(user.username,0,1).toUpperCase()}">U</span>
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold text-dark" th:text="${user.username}">username</div>
+                                            <div class="text-muted small" th:text="${user.realName}">realname</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="text-dark small"><i class="fa fa-envelope-o me-1 text-muted"></i> <span
+                                            th:text="${user.email}">email@example.com</span></div>
+                                    <div class="text-muted small"><i class="fa fa-phone me-1 text-muted"></i> <span
+                                            th:text="${user.phone}">13800000000</span></div>
+                                </td>
+                                <td>
+                                    <span th:if="${user.status == 1}"
+                                        class="badge bg-success bg-opacity-10 text-success rounded-pill px-3">启用</span>
+                                    <span th:if="${user.status == 0}"
+                                        class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-3">禁用</span>
+                                </td>
+                                <td class="text-muted small">
+                                    <i class="fa fa-clock-o me-1"></i> <span
+                                        th:text="${#temporals.format(user.createTime, 'yyyy-MM-dd HH:mm')}">2023-01-01</span>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <a th:href="@{/admin/users/edit/{id}(id=${user.id})}"
+                                        class="btn btn-sm btn-light text-primary me-1" title="编辑">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                    <button class="btn btn-sm btn-light text-danger"
+                                        th:onclick="'deleteUser(' + ${user.id} + ')'" title="删除">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr th:if="${page.records.empty}">
+                                <td colspan="6" class="text-center py-5 text-muted">
+                                    <i class="fa fa-inbox fa-3x mb-3 d-block opacity-25"></i>
+                                    暂无数据
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
+            <div class="card-footer bg-white border-0 py-3" th:if="${page.total > 0}">
+                <nav class="d-flex justify-content-between align-items-center">
+                    <div class="text-muted small">
+                        显示第 <span class="fw-bold" th:text="${(page.current - 1) * page.size + 1}">1</span>
+                        到 <span class="fw-bold"
+                            th:text="${(page.current - 1) * page.size + page.records.size()}">10</span> 条，
+                        共 <span class="fw-bold" th:text="${page.total}">100</span> 条
+                    </div>
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item" th:classappend="${!page.hasPrevious()} ? 'disabled'">
+                            <a class="page-link border-0 rounded-start"
+                                th:href="@{/admin/users(current=${page.current - 1}, keyword=${keyword})}"><i
+                                    class="fa fa-chevron-left"></i></a>
+                        </li>
+                        <li class="page-item disabled">
+                            <span class="page-link border-0 text-dark fw-bold"
+                                th:text="${page.current} + '/' + ${page.pages}">1/10</span>
+                        </li>
+                        <li class="page-item" th:classappend="${!page.hasNext()} ? 'disabled'">
+                            <a class="page-link border-0 rounded-end"
+                                th:href="@{/admin/users(current=${page.current + 1}, keyword=${keyword})}"><i
+                                    class="fa fa-chevron-right"></i></a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
         </div>
-    </div>
 
-    <!-- Bootstrap 5 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Delete User Script -->
-    <script>
-        function deleteUser(userId) {
-            if (confirm('确定要删除这个用户吗？')) {
-                fetch('/admin/api/users/' + userId, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json'
+        <script>
+            function deleteUser(id) {
+                Swal.fire({
+                    title: '确认删除?',
+                    text: "此操作无法撤销！",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: '是的, 删除!',
+                    cancelButtonText: '取消'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch(`/admin/api/users/${id}`, {
+                            method: 'DELETE'
+                        })
+                            .then(response => response.json())
+                            .then(res => {
+                                if (res.code === 200) {
+                                    Toast.fire({
+                                        icon: 'success',
+                                        title: '用户已删除'
+                                    }).then(() => {
+                                        location.reload();
+                                    });
+                                } else {
+                                    Swal.fire('Error', res.message || '删除失败', 'error');
+                                }
+                            })
+                            .catch(err => {
+                                console.error(err);
+                                Swal.fire('Error', '网络请求失败', 'error');
+                            });
                     }
                 })
-                .then(response => {
-                    if (response.ok) {
-                        // 刷新页面
-                        window.location.reload();
-                    } else {
-                        alert('删除用户失败');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('删除用户时发生错误');
-                });
             }
-        }
-    </script>
+        </script>
+    </section>
 </body>
+
 </html>

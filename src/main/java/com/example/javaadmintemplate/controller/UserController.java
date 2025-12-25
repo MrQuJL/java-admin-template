@@ -3,10 +3,11 @@ package com.example.javaadmintemplate.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.example.javaadmintemplate.common.Result;
+import com.example.javaadmintemplate.dto.UserDTO;
 import com.example.javaadmintemplate.entity.User;
 import com.example.javaadmintemplate.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,14 +35,24 @@ public class UserController {
      * GET /api/users?page=1&size=10
      */
     @GetMapping
-    public ResponseEntity<IPage<User>> getUserList(
+    public Result<IPage<User>> getUserList(
             @RequestParam(defaultValue = "1") Integer page,
-            @RequestParam(defaultValue = "10") Integer size) {
+            @RequestParam(defaultValue = "10") Integer size,
+            @RequestParam(required = false) String keyword) {
 
         Page<User> userPage = new Page<>(page, size);
-        IPage<User> userList = userService.page(userPage);
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
 
-        return ResponseEntity.ok(userList);
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            wrapper.like("username", keyword).or().like("email", keyword).or().like("real_name", keyword);
+        }
+
+        // 倒序排列
+        wrapper.orderByDesc("create_time");
+
+        IPage<User> userList = userService.page(userPage, wrapper);
+
+        return Result.success(userList);
     }
 
     /**
@@ -49,12 +60,12 @@ public class UserController {
      * GET /api/users/{id}
      */
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id) {
+    public Result<User> getUserById(@PathVariable Long id) {
         User user = userService.getById(id);
         if (user == null) {
-            return ResponseEntity.notFound().build();
+            return Result.error(404, "User not found");
         }
-        return ResponseEntity.ok(user);
+        return Result.success(user);
     }
 
     /**
@@ -62,13 +73,20 @@ public class UserController {
      * POST /api/users
      */
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user) {
-        // 加密密码
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+    public Result<User> createUser(@RequestBody UserDTO.Create userDTO) {
+        User user = new User();
+        user.setUsername(userDTO.getUsername());
+        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        user.setRealName(userDTO.getRealName());
+        user.setPhone(userDTO.getPhone());
+        user.setEmail(userDTO.getEmail());
+        user.setStatus(userDTO.getStatus());
+        user.setRemark(userDTO.getRemark());
         user.setCreateTime(LocalDateTime.now());
         user.setUpdateTime(LocalDateTime.now());
+
         userService.save(user);
-        return ResponseEntity.ok(user);
+        return Result.success(user);
     }
 
     /**
@@ -76,41 +94,33 @@ public class UserController {
      * PUT /api/users/{id}
      */
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
-        // 先查询数据库中的用户信息
+    public Result<User> updateUser(@PathVariable Long id, @RequestBody UserDTO.Update userDTO) {
         User existingUser = userService.getById(id);
         if (existingUser == null) {
-            return ResponseEntity.notFound().build();
+            return Result.error(404, "User not found");
         }
-        
-        // 只更新客户端明确提交的字段
-        if (user.getUsername() != null) {
-            existingUser.setUsername(user.getUsername());
+
+        if (userDTO.getUsername() != null)
+            existingUser.setUsername(userDTO.getUsername());
+        if (userDTO.getRealName() != null)
+            existingUser.setRealName(userDTO.getRealName());
+        if (userDTO.getPhone() != null)
+            existingUser.setPhone(userDTO.getPhone());
+        if (userDTO.getEmail() != null)
+            existingUser.setEmail(userDTO.getEmail());
+        if (userDTO.getStatus() != null)
+            existingUser.setStatus(userDTO.getStatus());
+        if (userDTO.getRemark() != null)
+            existingUser.setRemark(userDTO.getRemark());
+
+        if (userDTO.getPassword() != null && !userDTO.getPassword().isEmpty()) {
+            existingUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         }
-        if (user.getRealName() != null) {
-            existingUser.setRealName(user.getRealName());
-        }
-        if (user.getPhone() != null) {
-            existingUser.setPhone(user.getPhone());
-        }
-        if (user.getEmail() != null) {
-            existingUser.setEmail(user.getEmail());
-        }
-        if (user.getStatus() != null) {
-            existingUser.setStatus(user.getStatus());
-        }
-        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
-            existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
-        }
-        if (user.getRemark() != null) {
-            existingUser.setRemark(user.getRemark());
-        }
-        
-        // 更新时间
+
         existingUser.setUpdateTime(LocalDateTime.now());
-        
+
         userService.updateById(existingUser);
-        return ResponseEntity.ok(existingUser);
+        return Result.success(existingUser);
     }
 
     /**
@@ -118,12 +128,12 @@ public class UserController {
      * DELETE /api/users/{id}
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+    public Result<Void> deleteUser(@PathVariable Long id) {
         if (userService.count(new QueryWrapper<User>().eq("id", id)) == 0) {
-            return ResponseEntity.notFound().build();
+            return Result.error(404, "User not found");
         }
         userService.removeById(id);
-        return ResponseEntity.noContent().build();
+        return Result.success();
     }
 
     /**
@@ -131,9 +141,9 @@ public class UserController {
      * DELETE /api/users
      */
     @DeleteMapping
-    public ResponseEntity<Void> deleteUsers(@RequestBody List<Long> ids) {
+    public Result<Void> deleteUsers(@RequestBody List<Long> ids) {
         userService.removeByIds(ids);
-        return ResponseEntity.noContent().build();
+        return Result.success();
     }
 
     /**
@@ -141,11 +151,11 @@ public class UserController {
      * GET /api/users/username/{username}
      */
     @GetMapping("/username/{username}")
-    public ResponseEntity<List<User>> getUserByUsername(@PathVariable String username) {
+    public Result<List<User>> getUserByUsername(@PathVariable String username) {
         QueryWrapper<User> wrapper = new QueryWrapper<>();
         wrapper.like("username", username);
         List<User> users = userService.list(wrapper);
-        return ResponseEntity.ok(users);
+        return Result.success(users);
     }
 
     /**
@@ -153,15 +163,14 @@ public class UserController {
      * PATCH /api/users/{id}/status
      */
     @PatchMapping("/{id}/status")
-    public ResponseEntity<User> updateUserStatus(@PathVariable Long id, @RequestBody Integer status) {
+    public Result<User> updateUserStatus(@PathVariable Long id, @RequestBody Integer status) {
         User user = userService.getById(id);
         if (user == null) {
-            return ResponseEntity.notFound().build();
+            return Result.error(404, "User not found");
         }
         user.setStatus(status);
         user.setUpdateTime(LocalDateTime.now());
         userService.updateById(user);
-        return ResponseEntity.ok(user);
+        return Result.success(user);
     }
-
 }

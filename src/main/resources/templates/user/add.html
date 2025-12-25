@@ -1,167 +1,149 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{common/layout :: layout(~{::title}, ~{::section})}">
+
 <head>
-    <meta charset="UTF-8">
-    <title>新增用户 - Java Admin Template</title>
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <style>
-        body {
-            padding-top: 60px;
-        }
-        .sidebar {
-            height: 100vh;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 250px;
-            padding-top: 60px;
-            background-color: #343a40;
-            color: white;
-        }
-        .sidebar a {
-            color: white;
-            text-decoration: none;
-            display: block;
-            padding: 10px 20px;
-        }
-        .sidebar a:hover {
-            background-color: #495057;
-        }
-        .content {
-            margin-left: 250px;
-            padding: 20px;
-        }
-    </style>
+    <title>新增用户 - Admin Pro</title>
 </head>
+
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">Java Admin Template</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">欢迎, Admin</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">退出</a>
-                    </li>
-                </ul>
+    <section>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h4 class="fw-bold mb-1">新增用户</h4>
+                <p class="text-muted small mb-0">创建一个新的系统用户</p>
             </div>
+            <a href="/admin/users" class="btn btn-secondary">
+                <i class="fa fa-arrow-left me-1"></i> 返回列表
+            </a>
         </div>
-    </nav>
 
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <a href="/admin"><i class="fa fa-dashboard"></i> 仪表盘</a>
-        <a href="/admin/users"><i class="fa fa-users"></i> 用户管理</a>
-        <a href="#"><i class="fa fa-cog"></i> 系统设置</a>
-    </div>
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <form id="addUserForm" class="needs-validation" novalidate>
+                            <h6 class="fw-bold mb-3 text-uppercase small text-muted">基本信息</h6>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label for="username" class="form-label">用户名 <span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="username" name="username" required
+                                        minlength="3" maxlength="20">
+                                    <div class="invalid-feedback">请输入3-20位的用户名</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="password" class="form-label">密码 <span
+                                            class="text-danger">*</span></label>
+                                    <input type="password" class="form-control" id="password" name="password" required
+                                        minlength="6">
+                                    <div class="invalid-feedback">密码至少需要6位</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="realName" class="form-label">真实姓名 <span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="realName" name="realName" required>
+                                    <div class="invalid-feedback">请输入真实姓名</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="status" class="form-label">状态</label>
+                                    <select class="form-select" id="status" name="status">
+                                        <option value="1" selected>启用</option>
+                                        <option value="0">禁用</option>
+                                    </select>
+                                </div>
+                            </div>
 
-    <!-- Main Content -->
-    <div class="content">
-        <div class="container-fluid">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1 class="h3"><i class="fa fa-plus"></i> 新增用户</h1>
-                <a href="/admin/users" class="btn btn-secondary"><i class="fa fa-arrow-left"></i> 返回</a>
-            </div>
+                            <h6 class="fw-bold mb-3 text-uppercase small text-muted">联系方式</h6>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label for="phone" class="form-label">手机号码</label>
+                                    <input type="tel" class="form-control" id="phone" name="phone"
+                                        pattern="^1[3-9]\d{9}$">
+                                    <div class="invalid-feedback">请输入有效的手机号码</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="email" class="form-label">邮箱</label>
+                                    <input type="email" class="form-control" id="email" name="email">
+                                    <div class="invalid-feedback">请输入有效的邮箱地址</div>
+                                </div>
+                            </div>
 
-            <!-- Add User Form -->
-            <div class="card">
-                <div class="card-body">
-                    <form id="addUserForm">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="username" class="form-label">用户名 <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="username" name="username" required>
+                            <div class="mb-4">
+                                <label for="remark" class="form-label">备注</label>
+                                <textarea class="form-control" id="remark" name="remark" rows="3"></textarea>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="password" class="form-label">密码 <span class="text-danger">*</span></label>
-                                <input type="password" class="form-control" id="password" name="password" required>
+
+                            <div class="d-flex justify-content-end gap-2">
+                                <a href="/admin/users" class="btn btn-light px-4">取消</a>
+                                <button type="submit" class="btn btn-primary px-4">
+                                    <i class="fa fa-save me-1"></i> 保存用户
+                                </button>
                             </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="realName" class="form-label">真实姓名 <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="realName" name="realName" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="phone" class="form-label">手机号码</label>
-                                <input type="tel" class="form-control" id="phone" name="phone">
-                            </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="email" class="form-label">邮箱</label>
-                                <input type="email" class="form-control" id="email" name="email">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="status" class="form-label">状态 <span class="text-danger">*</span></label>
-                                <select class="form-select" id="status" name="status" required>
-                                    <option value="1">启用</option>
-                                    <option value="0">禁用</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="remark" class="form-label">备注</label>
-                            <textarea class="form-control" id="remark" name="remark" rows="3"></textarea>
-                        </div>
-                        
-                        <div class="d-flex justify-content-end gap-2">
-                            <a href="/admin/users" class="btn btn-secondary">取消</a>
-                            <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> 保存</button>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Bootstrap 5 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Form Submission Script -->
-    <script>
-        document.getElementById('addUserForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(this);
-            const userData = {};
-            
-            formData.forEach((value, key) => {
-                userData[key] = value;
+        <script>
+            // Bootstrap validation
+            (function () {
+                'use strict'
+                var forms = document.querySelectorAll('.needs-validation')
+                Array.prototype.slice.call(forms)
+                    .forEach(function (form) {
+                        form.addEventListener('submit', function (event) {
+                            if (!form.checkValidity()) {
+                                event.preventDefault()
+                                event.stopPropagation()
+                            }
+                            form.classList.add('was-validated')
+                        }, false)
+                    })
+            })()
+
+            document.getElementById('addUserForm').addEventListener('submit', function (e) {
+                e.preventDefault();
+                if (!this.checkValidity()) return;
+
+                const formData = new FormData(this);
+                const userData = Object.fromEntries(formData.entries());
+                userData.status = parseInt(userData.status);
+
+                const btn = this.querySelector('button[type="submit"]');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> 保存中...';
+                btn.disabled = true;
+
+                fetch('/admin/api/users', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userData)
+                })
+                    .then(response => response.json())
+                    .then(res => {
+                        if (res.code === 200) {
+                            Toast.fire({
+                                icon: 'success',
+                                title: '用户创建成功'
+                            }).then(() => {
+                                window.location.href = '/admin/users';
+                            });
+                        } else {
+                            Swal.fire('错误', res.message || '保存失败', 'error');
+                            btn.innerHTML = originalText;
+                            btn.disabled = false;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire('错误', '网络错误，请稍后重试', 'error');
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                    });
             });
-            
-            // 转换状态为数字
-            userData.status = parseInt(userData.status);
-            
-            fetch('/admin/api/users', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(userData)
-            })
-            .then(response => response.json())
-            .then(data => {
-                // 保存成功后跳转到用户列表页面
-                window.location.href = '/admin/users';
-            })
-            .catch(error => {
-                console.error('Error adding user:', error);
-                alert('添加用户失败，请重试！');
-            });
-        });
-    </script>
+        </script>
+    </section>
 </body>
+
 </html>

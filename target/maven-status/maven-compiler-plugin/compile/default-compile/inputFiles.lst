@@ -2,9 +2,12 @@
 /Users/qujianlei/Documents/GitHub/java-admin-template/src/main/java/com/example/javaadmintemplate/JavaAdminTemplateApplication.java
 /Users/qujianlei/Documents/GitHub/java-admin-template/src/main/java/com/example/javaadmintemplate/service/UserService.java
 /Users/qujianlei/Documents/GitHub/java-admin-template/src/main/java/com/example/javaadmintemplate/controller/AdminController.java
+/Users/qujianlei/Documents/GitHub/java-admin-template/src/main/java/com/example/javaadmintemplate/dto/UserDTO.java
 /Users/qujianlei/Documents/GitHub/java-admin-template/src/main/java/com/example/javaadmintemplate/dto/LoginResponse.java
 /Users/qujianlei/Documents/GitHub/java-admin-template/src/main/java/com/example/javaadmintemplate/mapper/UserMapper.java
+/Users/qujianlei/Documents/GitHub/java-admin-template/src/main/java/com/example/javaadmintemplate/common/GlobalExceptionHandler.java
 /Users/qujianlei/Documents/GitHub/java-admin-template/src/main/java/com/example/javaadmintemplate/config/MyBatisPlusConfig.java
+/Users/qujianlei/Documents/GitHub/java-admin-template/src/main/java/com/example/javaadmintemplate/common/Result.java
 /Users/qujianlei/Documents/GitHub/java-admin-template/src/main/java/com/example/javaadmintemplate/controller/TestController.java
 /Users/qujianlei/Documents/GitHub/java-admin-template/src/main/java/com/example/javaadmintemplate/controller/AuthController.java
 /Users/qujianlei/Documents/GitHub/java-admin-template/src/main/java/com/example/javaadmintemplate/dto/LoginRequest.java
