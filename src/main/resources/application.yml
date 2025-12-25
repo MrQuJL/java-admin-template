@@ -30,6 +30,14 @@ spring:
       settings:
         web-allow-others: false
 
+  # Thymeleaf配置
+  thymeleaf:
+    mode: HTML
+    encoding: UTF-8
+    cache: false
+    prefix: classpath:/templates/
+    suffix: .html
+
   # 多环境配置
   profiles:
     active: dev
@@ -55,3 +63,5 @@ logging:
   level:
     root: INFO
     com.example.javaadmintemplate.mapper: DEBUG
+    org.springframework.web: INFO
+    org.thymeleaf: INFO

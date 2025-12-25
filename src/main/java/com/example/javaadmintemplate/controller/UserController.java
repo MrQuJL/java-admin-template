@@ -77,13 +77,40 @@ public class UserController {
      */
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
-        if (userService.count(new QueryWrapper<User>().eq("id", id)) == 0) {
+        // 先查询数据库中的用户信息
+        User existingUser = userService.getById(id);
+        if (existingUser == null) {
             return ResponseEntity.notFound().build();
         }
-        user.setId(id);
-        user.setUpdateTime(LocalDateTime.now());
-        userService.updateById(user);
-        return ResponseEntity.ok(user);
+        
+        // 只更新客户端明确提交的字段
+        if (user.getUsername() != null) {
+            existingUser.setUsername(user.getUsername());
+        }
+        if (user.getRealName() != null) {
+            existingUser.setRealName(user.getRealName());
+        }
+        if (user.getPhone() != null) {
+            existingUser.setPhone(user.getPhone());
+        }
+        if (user.getEmail() != null) {
+            existingUser.setEmail(user.getEmail());
+        }
+        if (user.getStatus() != null) {
+            existingUser.setStatus(user.getStatus());
+        }
+        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+            existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
+        if (user.getRemark() != null) {
+            existingUser.setRemark(user.getRemark());
+        }
+        
+        // 更新时间
+        existingUser.setUpdateTime(LocalDateTime.now());
+        
+        userService.updateById(existingUser);
+        return ResponseEntity.ok(existingUser);
     }
 
     /**

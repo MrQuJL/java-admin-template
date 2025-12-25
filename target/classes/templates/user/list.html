@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>用户管理 - Java Admin Template</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding-top: 60px;
+        }
+        .sidebar {
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 250px;
+            padding-top: 60px;
+            background-color: #343a40;
+            color: white;
+        }
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 10px 20px;
+        }
+        .sidebar a:hover {
+            background-color: #495057;
+        }
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Java Admin Template</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">欢迎, Admin</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">退出</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <a href="/admin"><i class="fa fa-dashboard"></i> 仪表盘</a>
+        <a href="/admin/users"><i class="fa fa-users"></i> 用户管理</a>
+        <a href="#"><i class="fa fa-cog"></i> 系统设置</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content">
+        <div class="container-fluid">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3"><i class="fa fa-users"></i> 用户管理</h1>
+                <a href="/admin/users/add" class="btn btn-primary"><i class="fa fa-plus"></i> 新增用户</a>
+            </div>
+
+            <!-- User List Table -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>用户名</th>
+                                    <th>真实姓名</th>
+                                    <th>手机号码</th>
+                                    <th>邮箱</th>
+                                    <th>状态</th>
+                                    <th>创建时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="user : ${userList.records}">
+                                    <td th:text="${user.id}"></td>
+                                    <td th:text="${user.username}"></td>
+                                    <td th:text="${user.realName}"></td>
+                                    <td th:text="${user.phone}"></td>
+                                    <td th:text="${user.email}"></td>
+                                    <td>
+                                        <span th:if="${user.status == 1}" class="badge bg-success">启用</span>
+                                        <span th:else class="badge bg-danger">禁用</span>
+                                    </td>
+                                    <td th:text="${user.createTime}"></td>
+                                    <td>
+                                        <a th:href="@{/users/edit/{id}(id=${user.id})}" class="btn btn-sm btn-info"><i class="fa fa-edit"></i> 编辑</a>
+                                        <button class="btn btn-sm btn-danger" th:attr="onclick='deleteUser(' + ${user.id} + ')'"><i class="fa fa-trash"></i> 删除</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item" th:classappend="${userList.current == 1} ? 'disabled'">
+                                <a class="page-link" th:href="@{/admin/users(page=${userList.current - 1}, size=${userList.size})}" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item" th:each="i : ${#numbers.sequence(1, userList.pages)}" th:classappend="${i == userList.current} ? 'active'">
+                                <a class="page-link" th:href="@{/admin/users(page=${i}, size=${userList.size})}" th:text="${i}"></a>
+                            </li>
+                            <li class="page-item" th:classappend="${userList.current == userList.pages} ? 'disabled'">
+                                <a class="page-link" th:href="@{/admin/users(page=${userList.current + 1}, size=${userList.size})}" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Delete User Script -->
+    <script>
+        function deleteUser(userId) {
+            if (confirm('确定要删除这个用户吗？')) {
+                fetch('/admin/api/users/' + userId, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // 刷新页面
+                        window.location.reload();
+                    } else {
+                        alert('删除用户失败');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('删除用户时发生错误');
+                });
+            }
+        }
+    </script>
+</body>
+</html>

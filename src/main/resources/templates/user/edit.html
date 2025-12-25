@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>编辑用户 - Java Admin Template</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding-top: 60px;
+        }
+        .sidebar {
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 250px;
+            padding-top: 60px;
+            background-color: #343a40;
+            color: white;
+        }
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 10px 20px;
+        }
+        .sidebar a:hover {
+            background-color: #495057;
+        }
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Java Admin Template</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">欢迎, Admin</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">退出</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <a href="/admin"><i class="fa fa-dashboard"></i> 仪表盘</a>
+        <a href="/admin/users"><i class="fa fa-users"></i> 用户管理</a>
+        <a href="#"><i class="fa fa-cog"></i> 系统设置</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content">
+        <div class="container-fluid">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3"><i class="fa fa-edit"></i> 编辑用户</h1>
+                <a href="/admin/users" class="btn btn-secondary"><i class="fa fa-arrow-left"></i> 返回</a>
+            </div>
+
+            <!-- Edit User Form -->
+            <div class="card">
+                <div class="card-body">
+                    <form id="editUserForm">
+                        <input type="hidden" id="userId" th:value="${user.id}">
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="username" class="form-label">用户名 <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="username" name="username" th:value="${user.username}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="password" class="form-label">密码（不填则保持不变）</label>
+                                <input type="password" class="form-control" id="password" name="password">
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="realName" class="form-label">真实姓名 <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="realName" name="realName" th:value="${user.realName}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label">手机号码</label>
+                                <input type="tel" class="form-control" id="phone" name="phone" th:value="${user.phone}">
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">邮箱</label>
+                                <input type="email" class="form-control" id="email" name="email" th:value="${user.email}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="status" class="form-label">状态 <span class="text-danger">*</span></label>
+                                <select class="form-select" id="status" name="status" required>
+                                    <option value="1" th:selected="${user.status == 1}">启用</option>
+                                    <option value="0" th:selected="${user.status == 0}">禁用</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="remark" class="form-label">备注</label>
+                            <textarea class="form-control" id="remark" name="remark" rows="3" th:text="${user.remark}"></textarea>
+                        </div>
+                        
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="/admin/users" class="btn btn-secondary">取消</a>
+                            <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> 保存</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Form Submission Script -->
+    <script>
+        document.getElementById('editUserForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const userId = document.getElementById('userId').value;
+            const formData = new FormData(this);
+            const userData = {};
+            
+            formData.forEach((value, key) => {
+                if (value) { // 只提交非空字段
+                    userData[key] = value;
+                }
+            });
+            
+            // 转换状态为数字
+            if (userData.status !== undefined) {
+                userData.status = parseInt(userData.status);
+            }
+            
+            fetch(`/admin/api/users/${userId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(userData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                // 保存成功后跳转到用户列表页面
+                window.location.href = '/admin/users';
+            })
+            .catch(error => {
+                console.error('Error updating user:', error);
+                alert('更新用户失败，请重试！');
+            });
+        });
+    </script>
+</body>
+</html>
