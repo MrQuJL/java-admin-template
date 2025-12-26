@@ -13,6 +13,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class PageController {
 
     /**
+     * 登录页面
+     */
+    @GetMapping("/login")
+    public String login() {
+        return "login";
+    }
+
+    /**
      * 个人中心页面
      */
     @GetMapping("/user/profile")

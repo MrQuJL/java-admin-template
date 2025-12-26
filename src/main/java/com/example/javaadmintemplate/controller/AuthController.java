@@ -1,23 +1,20 @@
 package com.example.javaadmintemplate.controller;
 
-import com.example.javaadmintemplate.dto.LoginRequest;
-import com.example.javaadmintemplate.dto.LoginResponse;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.example.javaadmintemplate.common.Result;
+import com.example.javaadmintemplate.dto.LoginDTO;
 import com.example.javaadmintemplate.entity.User;
 import com.example.javaadmintemplate.service.UserService;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
+import javax.servlet.http.HttpSession;
 
 /**
  * 认证控制器
- * 处理登录、注册等认证相关请求
+ * 处理登录、登出等认证相关操作
  *
  * @author example
  */
@@ -34,40 +31,55 @@ public class AuthController {
     /**
      * 用户登录
      * POST /api/auth/login
-     *
-     * @param loginRequest 登录请求参数
-     * @return 登录响应，包含访问令牌和用户信息
      */
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
+    public Result<User> login(@RequestBody @Validated LoginDTO loginDTO, HttpSession session) {
         // 根据用户名查询用户
-        User user = userService.getByUsername(loginRequest.getUsername());
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        wrapper.eq("username", loginDTO.getUsername());
+        User user = userService.getOne(wrapper);
+
         if (user == null) {
-            return ResponseEntity.badRequest().body(null);
+            return Result.error(401, "用户名或密码错误");
         }
 
         // 验证密码
-        if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
-            return ResponseEntity.badRequest().body(null);
+        System.out.println("=== Login Debug ===");
+        System.out.println("Input password: " + loginDTO.getPassword());
+        System.out.println("Stored hash: " + user.getPassword());
+        System.out.println("Hash length: " + user.getPassword().length());
+        System.out.println("Hash starts with $2a: " + user.getPassword().startsWith("$2a"));
+
+        boolean matches = passwordEncoder.matches(loginDTO.getPassword(), user.getPassword());
+        System.out.println("Password matches: " + matches);
+
+        if (!matches) {
+            return Result.error(401, "用户名或密码错误");
         }
 
-        // 验证用户状态
+        // 检查用户状态
         if (user.getStatus() == 0) {
-            return ResponseEntity.badRequest().body(null);
+            return Result.error(403, "账号已被禁用");
         }
 
-        // 生成简单的访问令牌（实际项目中建议使用JWT）
-        String token = UUID.randomUUID().toString();
+        // 保存用户信息到session
+        session.setAttribute("currentUser", user);
 
-        // 构建响应
-        LoginResponse response = new LoginResponse();
-        response.setToken(token);
-
-        LoginResponse.UserInfo userInfo = new LoginResponse.UserInfo();
-        BeanUtils.copyProperties(user, userInfo);
-        response.setUser(userInfo);
-
-        return ResponseEntity.ok(response);
+        // 返回用户信息（不包含密码）
+        user.setPassword(null);
+        return Result.success(user);
     }
 
+    /**
+     * 获取当前登录用户
+     * GET /api/auth/current
+     */
+    @GetMapping("/current")
+    public Result<User> getCurrentUser(HttpSession session) {
+        User user = (User) session.getAttribute("currentUser");
+        if (user == null) {
+            return Result.error(401, "未登录");
+        }
+        return Result.success(user);
+    }
 }
