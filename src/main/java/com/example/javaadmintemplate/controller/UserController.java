@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.annotation.Validated;
-import javax.validation.Valid;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,6 +30,64 @@ public class UserController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    /**
+     * 获取当前用户详情 (Mock as ID 1)
+     * GET /api/users/profile
+     */
+    @GetMapping("/profile")
+    public Result<User> getProfile() {
+        // Mock current user as ID 1
+        Long currentUserId = 1L;
+        User user = userService.getById(currentUserId);
+        if (user == null) {
+            return Result.error(404, "User not found");
+        }
+        return Result.success(user);
+    }
+
+    /**
+     * 更新当前用户信息 (Mock as ID 1)
+     * PUT /api/users/profile
+     */
+    @PutMapping("/profile")
+    public Result<User> updateProfile(@RequestBody @Validated UserDTO.Update userDTO) {
+        // Mock current user as ID 1
+        Long currentUserId = 1L;
+        User existingUser = userService.getById(currentUserId);
+        if (existingUser == null) {
+            return Result.error(404, "User not found");
+        }
+
+        // Uniqueness Check (if username changed)
+        if (userDTO.getUsername() != null && !userDTO.getUsername().equals(existingUser.getUsername())) {
+            if (userService.count(new QueryWrapper<User>().eq("username", userDTO.getUsername())) > 0) {
+                return Result.error(400, "用户名已存在");
+            }
+        }
+
+        if (userDTO.getUsername() != null)
+            existingUser.setUsername(userDTO.getUsername());
+        if (userDTO.getRealName() != null)
+            existingUser.setRealName(userDTO.getRealName());
+        if (userDTO.getPhone() != null)
+            existingUser.setPhone(userDTO.getPhone());
+        if (userDTO.getEmail() != null)
+            existingUser.setEmail(userDTO.getEmail());
+        if (userDTO.getStatus() != null)
+            existingUser.setStatus(userDTO.getStatus());
+        if (userDTO.getRemark() != null)
+            existingUser.setRemark(userDTO.getRemark());
+
+        if (userDTO.getPassword() != null && !userDTO.getPassword().isEmpty()) {
+            existingUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        }
+
+        existingUser.setUpdateTime(LocalDateTime.now());
+
+        userService.updateById(existingUser);
+        return Result.success(existingUser);
+    }
 
     /**
      * 获取用户列表（分页）

@@ -266,6 +266,10 @@
                 th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/admin/users') ? 'active' : ''}">
                 <i class="fa fa-users"></i> 用户管理
             </a>
+            <a th:href="@{/user/profile}" class="menu-item"
+                th:classappend="${#strings.contains(#httpServletRequest.requestURI, 'user/profile') ? 'active' : ''}">
+                <i class="fa fa-user-circle"></i> 个人中心
+            </a>
             <a href="#" class="menu-item">
                 <i class="fa fa-cog"></i> 系统设置
             </a>
@@ -284,13 +288,16 @@
                 <i class="fa fa-chevron-down text-muted small ms-1"></i>
             </div>
             <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 mt-2">
-                <li><a class="dropdown-item py-2" href="#"><i class="fa fa-user-circle me-2 text-muted"></i> 个人中心</a>
+                <li><a class="dropdown-item py-2" th:href="@{/user/profile}"><i
+                            class="fa fa-user-circle me-2 text-muted"></i>
+                        个人中心</a>
                 </li>
                 <li><a class="dropdown-item py-2" href="#"><i class="fa fa-cog me-2 text-muted"></i> 账号设置</a></li>
                 <li>
                     <hr class="dropdown-divider">
                 </li>
-                <li><a class="dropdown-item py-2 text-danger" href="#"><i class="fa fa-sign-out me-2"></i> 退出登录</a></li>
+                <li><a class="dropdown-item py-2 text-danger" th:href="@{/logout}"><i class="fa fa-sign-out me-2"></i>
+                        退出登录</a></li>
             </ul>
         </div>
     </header>
