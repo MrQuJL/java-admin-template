@@ -84,7 +84,7 @@
                                         th:text="${#temporals.format(user.createTime, 'yyyy-MM-dd HH:mm')}">2023-01-01</span>
                                 </td>
                                 <td class="text-end pe-4">
-                                    <a th:href="@{/admin/users/edit/{id}(id=${user.id})}"
+                                    <a th:href="@{/users/edit/{id}(id=${user.id})}"
                                         class="btn btn-sm btn-light text-primary me-1" title="编辑">
                                         <i class="fa fa-edit"></i>
                                     </a>

@@ -10,6 +10,8 @@ import com.example.javaadmintemplate.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.validation.annotation.Validated;
+import javax.validation.Valid;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -73,7 +75,12 @@ public class UserController {
      * POST /api/users
      */
     @PostMapping
-    public Result<User> createUser(@RequestBody UserDTO.Create userDTO) {
+    public Result<User> createUser(@RequestBody @Validated UserDTO.Create userDTO) {
+        // Uniquess Check
+        if (userService.count(new QueryWrapper<User>().eq("username", userDTO.getUsername())) > 0) {
+            return Result.error(400, "用户名已存在");
+        }
+
         User user = new User();
         user.setUsername(userDTO.getUsername());
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
@@ -94,10 +101,17 @@ public class UserController {
      * PUT /api/users/{id}
      */
     @PutMapping("/{id}")
-    public Result<User> updateUser(@PathVariable Long id, @RequestBody UserDTO.Update userDTO) {
+    public Result<User> updateUser(@PathVariable Long id, @RequestBody @Validated UserDTO.Update userDTO) {
         User existingUser = userService.getById(id);
         if (existingUser == null) {
             return Result.error(404, "User not found");
+        }
+
+        // Uniqueness Check (if username changed)
+        if (userDTO.getUsername() != null && !userDTO.getUsername().equals(existingUser.getUsername())) {
+            if (userService.count(new QueryWrapper<User>().eq("username", userDTO.getUsername())) > 0) {
+                return Result.error(400, "用户名已存在");
+            }
         }
 
         if (userDTO.getUsername() != null)

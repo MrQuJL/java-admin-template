@@ -31,12 +31,27 @@ public class AdminController {
     public String getUserListPage(
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "10") Integer size,
+            @RequestParam(required = false) String keyword,
             Model model) {
 
         Page<User> userPage = new Page<>(page, size);
-        IPage<User> userList = userService.page(userPage);
+        com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<User> wrapper = new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<>();
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            wrapper.like("username", keyword)
+                    .or().like("email", keyword)
+                    .or().like("real_name", keyword);
+            model.addAttribute("keyword", keyword);
+        }
+
+        // 倒序排列
+        wrapper.orderByDesc("create_time");
+
+        IPage<User> userList = userService.page(userPage, wrapper);
 
         model.addAttribute("userList", userList);
+        // Page object is needed for pagination in view (which uses 'page' variable)
+        model.addAttribute("page", userList);
         return "user/list";
     }
 
