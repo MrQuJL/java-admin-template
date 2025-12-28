@@ -1,18 +1,19 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/java_admin?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=GMT%2B8&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://localhost:3306/admin_db?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
     username: root
     password: 123456
   redis:
     host: localhost
     port: 6379
+    password:
     database: 0
-    timeout: 3000ms
+    timeout: 3000
     lettuce:
       pool:
         max-active: 8
-        max-wait: -1ms
+        max-wait: -1
         max-idle: 8
         min-idle: 0
 
