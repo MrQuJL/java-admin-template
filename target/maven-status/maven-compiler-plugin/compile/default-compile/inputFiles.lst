@@ -1,0 +1,10 @@
+/Users/qujianlei/Documents/GitHub/java-admin-template/src/main/java/com/company/project/Application.java
+/Users/qujianlei/Documents/GitHub/java-admin-template/src/main/java/com/company/project/service/impl/DemoServiceImpl.java
+/Users/qujianlei/Documents/GitHub/java-admin-template/src/main/java/com/company/project/util/StringUtil.java
+/Users/qujianlei/Documents/GitHub/java-admin-template/src/main/java/com/company/project/entity/User.java
+/Users/qujianlei/Documents/GitHub/java-admin-template/src/main/java/com/company/project/controller/DemoController.java
+/Users/qujianlei/Documents/GitHub/java-admin-template/src/main/java/com/company/project/mapper/UserMapper.java
+/Users/qujianlei/Documents/GitHub/java-admin-template/src/main/java/com/company/project/service/DemoService.java
+/Users/qujianlei/Documents/GitHub/java-admin-template/src/main/java/com/company/project/exception/GlobalExceptionHandler.java
+/Users/qujianlei/Documents/GitHub/java-admin-template/src/main/java/com/company/project/dto/Result.java
+/Users/qujianlei/Documents/GitHub/java-admin-template/src/main/java/com/company/project/config/Knife4jConfig.java
