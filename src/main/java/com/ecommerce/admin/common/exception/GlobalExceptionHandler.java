@@ -25,6 +25,8 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(BusinessException.class)
     public Result<?> handleBusinessException(BusinessException e) {
+        // 记录业务异常日志
+        log.error("业务异常：{}", e.getMessage(), e);
         return Result.fail(e.getCode(), e.getMessage());
     }
 
@@ -37,6 +39,8 @@ public class GlobalExceptionHandler {
     public Result<?> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         // 获取第一个校验失败的字段和错误信息
         String message = e.getBindingResult().getFieldError().getDefaultMessage();
+        // 记录参数校验异常日志
+        log.error("参数校验异常：{}", message, e);
         return Result.fail(ResponseEnum.PARAM_ERROR.getCode(), message);
     }
     
@@ -49,6 +53,8 @@ public class GlobalExceptionHandler {
     public Result<?> handleMissingServletRequestParameterException(MissingServletRequestParameterException e) {
         // 构造错误信息
         String message = e.getParameterName() + "不能为空";
+        // 记录请求参数缺失异常日志
+        log.error("请求参数缺失异常：{}", message, e);
         return Result.fail(ResponseEnum.PARAM_ERROR.getCode(), message);
     }
     
@@ -61,6 +67,8 @@ public class GlobalExceptionHandler {
     public Result<?> handleConstraintViolationException(ConstraintViolationException e) {
         // 获取第一个校验失败的错误信息
         String message = e.getConstraintViolations().iterator().next().getMessage();
+        // 记录请求参数约束违反异常日志
+        log.error("请求参数约束违反异常：{}", message, e);
         return Result.fail(ResponseEnum.PARAM_ERROR.getCode(), message);
     }
     
@@ -73,6 +81,8 @@ public class GlobalExceptionHandler {
     public Result<?> handleBindException(BindException e) {
         // 获取第一个校验失败的字段和错误信息
         String message = e.getBindingResult().getFieldError().getDefaultMessage();
+        // 记录绑定异常日志
+        log.error("绑定异常：{}", message, e);
         return Result.fail(ResponseEnum.PARAM_ERROR.getCode(), message);
     }
 
@@ -83,7 +93,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(RuntimeException.class)
     public Result<?> handleRuntimeException(RuntimeException e) {
-        // 记录日志，包含异常信息和堆栈跟踪
+        // 记录运行时异常日志
         log.error("运行时异常：{}", e.getMessage(), e);
         return Result.fail(ResponseEnum.SYSTEM_ERROR.getCode(), "系统异常：" + e.getMessage());
     }
@@ -95,7 +105,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public Result<?> handleException(Exception e) {
-        // 记录日志，包含异常信息和堆栈跟踪
+        // 记录系统异常日志
         log.error("系统异常：{}", e.getMessage(), e);
         return Result.fail(ResponseEnum.SYSTEM_ERROR.getCode(), "系统异常：" + e.getMessage());
     }
