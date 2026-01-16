@@ -1,14 +1,12 @@
+# 开发环境配置
 spring:
+  # 数据源配置
   datasource:
-    url: jdbc:mysql://localhost:3306/java_admin_template?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://localhost:3306/ecommerce?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
     username: root
     password: 123456
-    driver-class-name: com.mysql.cj.jdbc.Driver
 
-mybatis-plus:
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-
+# 日志配置
 logging:
   level:
-    '[com.company.project]': debug
+    "[com.ecommerce.admin]": debug
