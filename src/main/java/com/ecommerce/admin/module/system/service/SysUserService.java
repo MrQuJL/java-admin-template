@@ -3,6 +3,7 @@ package com.ecommerce.admin.module.system.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ecommerce.admin.module.system.dto.SysUserDTO;
 import com.ecommerce.admin.module.system.entity.SysUser;
+import java.util.List;
 
 /**
  * 系统用户Service接口
@@ -44,4 +45,10 @@ public interface SysUserService extends IService<SysUser> {
      * @return SysUser
      */
     SysUser updateUser(Long id, SysUserDTO userDTO);
+    
+    /**
+     * 获取所有用户数据
+     * @return 所有用户列表
+     */
+    List<SysUser> listAll();
 }

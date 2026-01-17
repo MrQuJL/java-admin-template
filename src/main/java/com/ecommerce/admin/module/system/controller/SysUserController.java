@@ -3,18 +3,28 @@ package com.ecommerce.admin.module.system.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ecommerce.admin.common.result.Result;
+import com.ecommerce.admin.common.util.EasyUtils;
 import com.ecommerce.admin.module.system.dto.SysUserDTO;
 import com.ecommerce.admin.module.system.entity.SysUser;
 import com.ecommerce.admin.module.system.service.SysUserService;
 import com.ecommerce.admin.module.system.vo.SysUserVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
+
 
 /**
  * 系统用户Controller
@@ -23,6 +33,7 @@ import javax.validation.constraints.NotNull;
 @RestController
 @RequestMapping("/system/user")
 @Validated
+@Slf4j
 public class SysUserController {
 
     @Autowired
@@ -134,5 +145,31 @@ public class SysUserController {
         sysUserService.removeById(id);
         
         return Result.success();
+    }
+    
+    /**
+     * 导出用户数据
+     * @param response HttpServletResponse
+     * @throws IOException IO异常
+     */
+    @ApiOperation("导出用户数据")
+    @GetMapping("/export")
+    public void exportExcel(HttpServletResponse response) throws IOException {
+        // 查询用户列表
+        List<SysUser> userList = sysUserService.listAll();
+        
+        // 转换为VO对象
+        List<SysUserVO> voList = userList.stream().map(user -> modelMapper.map(user, SysUserVO.class)).collect(Collectors.toList());
+        
+        // 导出Excel
+        EasyUtils.write(voList, SysUserVO.class, "用户数据", "用户数据", response);
+    }
+
+    @PostMapping("/parseData")
+    public Result<List<SysUserVO>> parseData(@RequestParam("excel") MultipartFile excelFile) throws IOException {
+        List<SysUserVO> list = EasyUtils.read(excelFile.getInputStream(), SysUserVO.class);
+        log.info("解析到 {} 条用户数据", list.size());
+        log.info("用户数据: {}", list);
+        return Result.success(list);
     }
 }

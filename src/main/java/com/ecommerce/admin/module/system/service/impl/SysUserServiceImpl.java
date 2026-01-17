@@ -10,6 +10,7 @@ import com.ecommerce.admin.module.system.service.SysUserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import java.util.List;
 
 /**
  * 系统用户Service实现类
@@ -135,5 +136,16 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         this.updateById(user);
         
         return user;
+    }
+    
+    /**
+     * 获取所有用户数据
+     * @return 所有未删除的用户列表
+     */
+    @Override
+    public List<SysUser> listAll() {
+        return this.lambdaQuery()
+                .eq(SysUser::getDeleted, 0)
+                .list();
     }
 }

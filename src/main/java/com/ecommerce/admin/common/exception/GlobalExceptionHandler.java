@@ -95,7 +95,7 @@ public class GlobalExceptionHandler {
     public Result<?> handleRuntimeException(RuntimeException e) {
         // 记录运行时异常日志
         log.error("运行时异常：{}", e.getMessage(), e);
-        return Result.fail(ResponseEnum.SYSTEM_ERROR.getCode(), "系统异常：" + e.getMessage());
+        return Result.fail(ResponseEnum.SYSTEM_ERROR.getCode(), "运行时异常：" + e.getMessage());
     }
 
     /**

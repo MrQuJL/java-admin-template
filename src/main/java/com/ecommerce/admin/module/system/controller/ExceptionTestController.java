@@ -5,6 +5,8 @@ import com.ecommerce.admin.common.enums.response.ResponseEnum;
 import com.ecommerce.admin.common.result.Result;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +22,7 @@ import javax.validation.constraints.NotBlank;
 @RequestMapping("/api/exception-test")
 @Api(tags = "异常测试接口")
 @Validated  // 用于验证 @RequestParam 参数
+@Slf4j
 public class ExceptionTestController {
 
     /**
@@ -82,9 +85,10 @@ public class ExceptionTestController {
     @GetMapping("/runtime-exception")
     @ApiOperation("测试运行时异常")
     public Result<?> testRuntimeException() {
-        // 主动抛出空指针异常
-        String nullStr = null;
-        return Result.success("长度: " + nullStr.length());
+        // 除0异常
+        int zeroDivisor = 0;
+        int result = 10 / zeroDivisor;
+        return Result.success("结果: " + result);
     }
 
     /**
