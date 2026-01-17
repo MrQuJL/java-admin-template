@@ -1,9 +1,8 @@
 package com.ecommerce.admin.common.interceptor;
 
+import com.alibaba.fastjson2.JSON;
 import com.ecommerce.admin.common.constants.DateConstants;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -44,8 +43,9 @@ public class RequestLogInterceptor implements HandlerInterceptor {
         if (handler instanceof HandlerMethod) {
             // 获取请求基本信息
             String url = request.getRequestURI();
-            String ip = getClientIp(request);
+            String ip = request.getRemoteAddr();
             String method = request.getMethod();
+            String requestTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern(DateConstants.DATE_TIME_FORMAT));
             
             // 获取Controller信息
             HandlerMethod handlerMethod = (HandlerMethod) handler;
@@ -99,9 +99,8 @@ public class RequestLogInterceptor implements HandlerInterceptor {
             logMsg.append("Method: ").append(method).append("\n");
             logMsg.append("Content-Type: ").append(requestType).append("\n");
             logMsg.append("Controller: ").append(className).append(".").append(methodName).append("\n");
-            logMsg.append("Params: ").append(toJsonString(params)).append("\n");
-            String formattedTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern(DateConstants.DATE_TIME_FORMAT));
-            logMsg.append("Request Time: ").append(formattedTime).append("\n");
+            logMsg.append("Params: ").append(JSON.toJSONString(params)).append("\n");
+            logMsg.append("Request Time: ").append(requestTime).append("\n");
             logMsg.append("Processing Time: ").append(duration).append("ms\n");
             logMsg.append("Response Status: ").append(response.getStatus()).append("\n");
             
@@ -115,37 +114,4 @@ public class RequestLogInterceptor implements HandlerInterceptor {
             log.info(logMsg.toString());
         }
     }
-
-    /**
-     * 获取客户端真实IP地址
-     */
-    private String getClientIp(HttpServletRequest request) {
-        String ip = request.getHeader("X-Forwarded-For");
-        if (StringUtils.isBlank(ip) || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("Proxy-Client-IP");
-        }
-        if (StringUtils.isBlank(ip) || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("WL-Proxy-Client-IP");
-        }
-        if (StringUtils.isBlank(ip) || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getRemoteAddr();
-        }
-        // 处理多个IP地址的情况，取第一个
-        if (StringUtils.isNotBlank(ip) && ip.contains(",")) {
-            ip = ip.split(",")[0].trim();
-        }
-        return ip;
-    }
-
-    /**
- * 对象转JSON字符串
- */
-private String toJsonString(Object obj) {
-    try {
-        ObjectMapper mapper = new ObjectMapper();
-        return mapper.writeValueAsString(obj);
-    } catch (Exception e) {
-        return obj.toString();
-    }
-}
 }
