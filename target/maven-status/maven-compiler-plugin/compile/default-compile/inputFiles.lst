@@ -21,6 +21,7 @@
 /Users/qujianlei/Documents/GitHub/java-admin-template/src/main/java/com/ecommerce/admin/common/util/EasyUtils.java
 /Users/qujianlei/Documents/GitHub/java-admin-template/src/main/java/com/ecommerce/admin/common/util/DateUtils.java
 /Users/qujianlei/Documents/GitHub/java-admin-template/src/main/java/com/ecommerce/admin/common/util/EncryptUtils.java
+/Users/qujianlei/Documents/GitHub/java-admin-template/src/main/java/com/ecommerce/admin/test/JsonFormatTest.java
 /Users/qujianlei/Documents/GitHub/java-admin-template/src/main/java/com/ecommerce/admin/module/system/enums/business/UserDeleteEnum.java
 /Users/qujianlei/Documents/GitHub/java-admin-template/src/main/java/com/ecommerce/admin/common/config/CorsConfig.java
 /Users/qujianlei/Documents/GitHub/java-admin-template/src/main/java/com/ecommerce/admin/common/enums/business/YesNoEnum.java

@@ -1,6 +1,8 @@
 package com.ecommerce.admin.common.interceptor;
 
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
+import com.alibaba.fastjson2.JSONWriter.Feature;
 import com.ecommerce.admin.common.constants.DateConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -57,17 +59,17 @@ public class RequestLogInterceptor implements HandlerInterceptor {
             String requestType = contentType != null ? contentType : "unknown";
             
             // 获取请求参数
-            Map<String, Object> params = new HashMap<>();
+            Map<String, String> params = new HashMap<>();
             
             // 获取GET请求参数
             Map<String, String[]> parameterMap = request.getParameterMap();
             for (Map.Entry<String, String[]> entry : parameterMap.entrySet()) {
-                params.put(entry.getKey(), Arrays.asList(entry.getValue()));
+                params.put(entry.getKey(), entry.getValue()[0]);
             }
             
             // 获取JSON请求体
             String requestBody = null;
-            // 尝试从ContentCachingRequestWrapper获取请求体（Spring Boot会自动包装）
+            // 从ContentCachingRequestWrapper获取请求体（已通过过滤器包装）
             ContentCachingRequestWrapper cachingRequest = WebUtils.getNativeRequest(request, ContentCachingRequestWrapper.class);
             if (cachingRequest != null) {
                 byte[] contentAsByteArray = cachingRequest.getContentAsByteArray();
@@ -76,16 +78,15 @@ public class RequestLogInterceptor implements HandlerInterceptor {
                 }
             }
             
-            // 如果没有获取到请求体，尝试从request属性中获取（兼容旧版方式）
-            if (requestBody == null || requestBody.isEmpty()) {
-                requestBody = (String) request.getAttribute("requestBody");
-            }
-            
             // 将JSON请求体添加到params中
             if (requestBody != null && !requestBody.isEmpty()) {
-                params.put("body", requestBody);
+                // requestBody = JSON.toJSONString(requestBody, Feature.PrettyFormat);
+                // JSONObject jsonObject = JSON.parseObject(jsonStr);
+                // log.info("请求体: {}", requestBody);
             }
             
+            JSONObject paramsJson = JSON.parseObject(JSON.toJSONString(params));
+
             // 计算请求处理时间
             long startTime = (long) request.getAttribute("startTime");
             long endTime = System.currentTimeMillis();
@@ -99,7 +100,9 @@ public class RequestLogInterceptor implements HandlerInterceptor {
             logMsg.append("Method: ").append(method).append("\n");
             logMsg.append("Content-Type: ").append(requestType).append("\n");
             logMsg.append("Controller: ").append(className).append(".").append(methodName).append("\n");
-            logMsg.append("Params: ").append(JSON.toJSONString(params)).append("\n");
+            // 使用JSON格式化输出，方便查看
+            logMsg.append("Params: \n").append(JSON.toJSONString(paramsJson, Feature.PrettyFormat)).append("\n");
+            logMsg.append("Body: ").append(requestBody).append("\n");
             logMsg.append("Request Time: ").append(requestTime).append("\n");
             logMsg.append("Processing Time: ").append(duration).append("ms\n");
             logMsg.append("Response Status: ").append(response.getStatus()).append("\n");
