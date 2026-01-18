@@ -10,6 +10,7 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.util.ContentCachingRequestWrapper;
+import org.springframework.web.util.ContentCachingResponseWrapper;
 import org.springframework.web.util.WebUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -61,11 +62,13 @@ public class RequestLogInterceptor implements HandlerInterceptor {
             // 获取请求参数
             Map<String, String> params = new HashMap<>();
             
-            // 获取GET请求参数
+            // 获取GET、POST请求参数
             Map<String, String[]> parameterMap = request.getParameterMap();
             for (Map.Entry<String, String[]> entry : parameterMap.entrySet()) {
                 params.put(entry.getKey(), entry.getValue()[0]);
             }
+            JSONObject paramsJson = JSON.parseObject(JSON.toJSONString(params));
+            String paramsJsonStr = JSON.toJSONString(paramsJson, Feature.PrettyFormat).replace("\t", "    ");
             
             // 获取JSON请求体
             String requestBody = null;
@@ -75,17 +78,12 @@ public class RequestLogInterceptor implements HandlerInterceptor {
                 byte[] contentAsByteArray = cachingRequest.getContentAsByteArray();
                 if (contentAsByteArray.length > 0) {
                     requestBody = new String(contentAsByteArray, StandardCharsets.UTF_8);
+                    if (JSON.isValid(requestBody)) {
+                        Object jsonBody = JSON.parse(requestBody);
+                        requestBody = JSON.toJSONString(jsonBody, Feature.PrettyFormat).replace("\t", "    ");
+                    }
                 }
             }
-            
-            // 将JSON请求体添加到params中
-            if (requestBody != null && !requestBody.isEmpty()) {
-                // requestBody = JSON.toJSONString(requestBody, Feature.PrettyFormat);
-                // JSONObject jsonObject = JSON.parseObject(jsonStr);
-                // log.info("请求体: {}", requestBody);
-            }
-            
-            JSONObject paramsJson = JSON.parseObject(JSON.toJSONString(params));
 
             // 计算请求处理时间
             long startTime = (long) request.getAttribute("startTime");
@@ -94,24 +92,46 @@ public class RequestLogInterceptor implements HandlerInterceptor {
             
             // 构建日志信息
             StringBuilder logMsg = new StringBuilder();
-            logMsg.append("\n=== 请求日志 ===\n");
+            logMsg.append("\n================================================");
+            logMsg.append("\n=================== 请求日志 ===================\n");
+            logMsg.append("================================================\n");
             logMsg.append("URL: ").append(url).append("\n");
             logMsg.append("IP: ").append(ip).append("\n");
             logMsg.append("Method: ").append(method).append("\n");
             logMsg.append("Content-Type: ").append(requestType).append("\n");
             logMsg.append("Controller: ").append(className).append(".").append(methodName).append("\n");
-            // 使用JSON格式化输出，方便查看
-            logMsg.append("Params: \n").append(JSON.toJSONString(paramsJson, Feature.PrettyFormat)).append("\n");
-            logMsg.append("Body: ").append(requestBody).append("\n");
+            logMsg.append("Params: \n").append(paramsJsonStr).append("\n");
+            logMsg.append("Request Body: \n").append(requestBody).append("\n");
             logMsg.append("Request Time: ").append(requestTime).append("\n");
             logMsg.append("Processing Time: ").append(duration).append("ms\n");
-            logMsg.append("Response Status: ").append(response.getStatus()).append("\n");
             
-            if (ex != null) {
-                logMsg.append("Exception: ").append(ex.getClass().getSimpleName()).append(": ").append(ex.getMessage()).append("\n");
+            // 增加响应日志
+            String responseType = response.getContentType();
+
+            // 获取响应体
+            String responseBody = null;
+            ContentCachingResponseWrapper cachingResponse = WebUtils.getNativeResponse(response, ContentCachingResponseWrapper.class);
+            if (cachingResponse != null) {
+                byte[] contentAsByteArray = cachingResponse.getContentAsByteArray();
+                if (contentAsByteArray.length > 0) {
+                    responseBody = new String(contentAsByteArray, StandardCharsets.UTF_8);
+                    if (JSON.isValid(responseBody)) {
+                        Object jsonBody = JSON.parse(responseBody);
+                        responseBody = JSON.toJSONString(jsonBody, Feature.PrettyFormat, Feature.WriteNulls).replace("\t", "    ");
+                    }
+                }
             }
+
+            logMsg.append("\n================================================\n");
+            logMsg.append("=================== 响应日志 ===================\n");
+            logMsg.append("================================================\n");
+            logMsg.append("Response Status: ").append(response.getStatus()).append("\n");
+            logMsg.append("Content-Type: ").append(responseType).append("\n");
+            logMsg.append("Response Body: \n").append(responseBody).append("\n");
             
-            logMsg.append("================\n");
+            logMsg.append("================================================\n");
+            logMsg.append("=================== 日志结束 ===================\n");
+            logMsg.append("================================================\n");
             
             // 打印日志
             log.info(logMsg.toString());

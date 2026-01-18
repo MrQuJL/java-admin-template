@@ -1,17 +1,18 @@
 package com.ecommerce.admin.module.system.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ecommerce.admin.common.result.Result;
 import com.ecommerce.admin.common.util.EasyUtils;
 import com.ecommerce.admin.module.system.dto.SysUserDTO;
 import com.ecommerce.admin.module.system.entity.SysUser;
 import com.ecommerce.admin.module.system.service.SysUserService;
 import com.ecommerce.admin.module.system.vo.SysUserVO;
+import com.ecommerce.admin.common.validation.AddGroup;
+import com.ecommerce.admin.common.validation.UpdateGroup;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
-
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -50,16 +51,14 @@ public class SysUserController {
      */
     @ApiOperation("分页查询用户列表")
     @GetMapping("/list")
-    public Result<IPage<SysUserVO>> list(@RequestParam(defaultValue = "1") Integer page,
-                                         @RequestParam(defaultValue = "10") Integer size) {
-        // 创建分页对象
-        Page<SysUser> pageParam = new Page<>(page, size);
-        
-        // 查询用户列表
-        IPage<SysUser> userPage = sysUserService.page(pageParam);
-        
-        // 转换为VO对象
-        IPage<SysUserVO> voPage = userPage.convert(user -> modelMapper.map(user, SysUserVO.class));
+    public Result<IPage<SysUserVO>> list(@ApiParam(value = "当前页码", example = "1")
+                                         @RequestParam(defaultValue = "1") Integer page,
+                                         @ApiParam(value = "每页大小", example = "10")
+                                         @RequestParam(defaultValue = "10") Integer size,
+                                         @ApiParam(value = "用户名（模糊查询）", example = "admin")
+                                         @RequestParam(required = false) String username) {
+        // 调用service层查询
+        IPage<SysUserVO> voPage = sysUserService.getUserPage(page, size, username);
         
         return Result.success(voPage);
     }
@@ -71,18 +70,12 @@ public class SysUserController {
      */
     @ApiOperation("根据ID查询用户详情")
     @GetMapping("/getById")
-    public Result<SysUserVO> getById(@RequestParam
+    public Result<SysUserVO> getById(@ApiParam(value = "用户ID", required = true, example = "1")
+                                     @RequestParam
                                      @NotNull(message = "用户ID不能为空")
                                      @Min(value = 1, message = "用户ID必须为正数") Long id) {
-        // 查询用户
-        SysUser user = sysUserService.getById(id);
-        
-        if (user == null) {
-            return Result.fail(404, "用户不存在");
-        }
-        
-        // 转换为VO对象
-        SysUserVO vo = modelMapper.map(user, SysUserVO.class);
+        // 调用service层查询
+        SysUserVO vo = sysUserService.getUserDetail(id);
         
         return Result.success(vo);
     }
@@ -94,34 +87,23 @@ public class SysUserController {
      */
     @ApiOperation("创建用户")
     @PostMapping("/create")
-    public Result<SysUserVO> create(@Validated @RequestBody SysUserDTO userDTO) {
+    public Result<SysUserVO> create(@Validated(AddGroup.class) @RequestBody SysUserDTO userDTO) {
         // 调用service层创建用户
-        SysUser user = sysUserService.createUser(userDTO);
-        
-        // 转换为VO对象
-        SysUserVO vo = modelMapper.map(user, SysUserVO.class);
+        SysUserVO vo = sysUserService.createUser(userDTO);
         
         return Result.success(vo);
     }
 
     /**
      * 更新用户
-     * @param id 用户ID
      * @param userDTO 用户DTO
      * @return Result<SysUserVO>
      */
     @ApiOperation("更新用户")
     @PostMapping("/update")
-    public Result<SysUserVO> update(@RequestParam
-                                    @NotNull(message = "用户ID不能为空")
-                                    @Min(value = 1, message = "用户ID必须为正数") Long id,
-                                    @Validated
-                                    @RequestBody SysUserDTO userDTO) {
+    public Result<SysUserVO> update(@Validated(UpdateGroup.class) @RequestBody SysUserDTO userDTO) {
         // 调用service层更新用户
-        SysUser user = sysUserService.updateUser(id, userDTO);
-        
-        // 转换为VO对象
-        SysUserVO vo = modelMapper.map(user, SysUserVO.class);
+        SysUserVO vo = sysUserService.updateUser(userDTO);
         
         return Result.success(vo);
     }
@@ -136,13 +118,8 @@ public class SysUserController {
     public Result<Void> delete(@RequestParam
                                @NotNull(message = "用户ID不能为空")
                                @Min(value = 1, message = "用户ID必须为正数") Long id) {
-        // 检查用户是否存在
-        if (sysUserService.getById(id) == null) {
-            return Result.fail(404, "用户不存在");
-        }
-        
-        // 删除用户（逻辑删除）
-        sysUserService.removeById(id);
+        // 调用service层删除用户
+        sysUserService.deleteUser(id);
         
         return Result.success();
     }
