@@ -89,3 +89,7 @@ generated/
 # Custom
 /target/
 /users.xlsx
+
+# Editor & IDE
+.trae/
+.vscode/
