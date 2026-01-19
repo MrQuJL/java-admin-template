@@ -4,26 +4,80 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ecommerce.admin.common.exception.BusinessException;
+import com.ecommerce.admin.common.util.EasyUtils;
 import com.ecommerce.admin.module.system.dto.SysUserDTO;
 import com.ecommerce.admin.module.system.entity.SysUser;
 import com.ecommerce.admin.module.system.enums.response.SystemResponseEnum;
+import com.ecommerce.admin.module.system.enums.business.UserStatusEnum;
 import com.ecommerce.admin.module.system.mapper.SysUserMapper;
 import com.ecommerce.admin.module.system.service.SysUserService;
+import com.ecommerce.admin.module.system.vo.SysUserExcel;
 import com.ecommerce.admin.module.system.vo.SysUserVO;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 系统用户Service实现类
  */
 @Service
+@Slf4j
 public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> implements SysUserService {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    /**
+     * 获取所有用户数据用于导出
+     * @return List<SysUserExcel>
+     */
+    @Override
+    public List<SysUserExcel> getAllUsersForExport() {
+        // 查询所有用户
+        List<SysUser> userList = this.listAll();
+        
+        // 转换为Excel VO对象
+        return userList.stream()
+                .map(user -> modelMapper.map(user, SysUserExcel.class))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 解析Excel数据
+     * @param excelFile Excel文件
+     * @return List<SysUserVO>
+     * @throws IOException IO异常
+     */
+    @Override
+    public List<SysUserVO> parseUserExcel(MultipartFile excelFile) throws IOException {
+        // 读取Excel数据
+        List<SysUserExcel> excelList = EasyUtils.read(excelFile.getInputStream(), SysUserExcel.class);
+        log.info("解析到 {} 条用户数据", excelList.size());
+        
+        // 转换为VO对象
+        List<SysUserVO> voList = excelList.stream()
+                .map(excel -> {
+                    SysUserVO vo = modelMapper.map(excel, SysUserVO.class);
+                    // 手动设置状态，使用枚举转换
+                    if (UserStatusEnum.ENABLED.getDesc().equals(excel.getStatusName())) {
+                        vo.setIsActive(UserStatusEnum.ENABLED.getCode());
+                    } else {
+                        vo.setIsActive(UserStatusEnum.DISABLED.getCode());
+                    }
+                    return vo;
+                })
+                .collect(Collectors.toList());
+        
+        log.info("转换后的用户数据: {}", voList);
+        return voList;
+    }
 
     /**
      * 分页查询用户

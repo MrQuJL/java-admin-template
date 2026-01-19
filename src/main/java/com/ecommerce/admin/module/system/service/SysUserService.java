@@ -4,14 +4,31 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ecommerce.admin.module.system.dto.SysUserDTO;
 import com.ecommerce.admin.module.system.entity.SysUser;
+import com.ecommerce.admin.module.system.vo.SysUserExcel;
 import com.ecommerce.admin.module.system.vo.SysUserVO;
 
+import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;
 import java.util.List;
 
 /**
  * 系统用户Service接口
  */
 public interface SysUserService extends IService<SysUser> {
+    
+    /**
+     * 获取所有用户数据用于导出
+     * @return List<SysUserExcel>
+     */
+    List<SysUserExcel> getAllUsersForExport();
+
+    /**
+     * 解析Excel数据
+     * @param excelFile Excel文件
+     * @return List<SysUserVO>
+     * @throws IOException IO异常
+     */
+    List<SysUserVO> parseUserExcel(MultipartFile excelFile) throws IOException;
     
     /**
      * 分页查询用户
