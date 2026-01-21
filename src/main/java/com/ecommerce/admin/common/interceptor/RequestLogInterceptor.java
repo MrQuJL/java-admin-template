@@ -92,9 +92,9 @@ public class RequestLogInterceptor implements HandlerInterceptor {
             
             // 构建日志信息
             StringBuilder logMsg = new StringBuilder();
-            logMsg.append("\n================================================");
-            logMsg.append("\n=================== 请求日志 ===================\n");
-            logMsg.append("================================================\n");
+            logMsg.append("\n========================================================================================");
+            logMsg.append("\n======================================= 请求日志 =======================================\n");
+            logMsg.append("========================================================================================\n");
             logMsg.append("URL: ").append(url).append("\n");
             logMsg.append("IP: ").append(ip).append("\n");
             logMsg.append("Method: ").append(method).append("\n");
@@ -122,16 +122,16 @@ public class RequestLogInterceptor implements HandlerInterceptor {
                 }
             }
 
-            logMsg.append("\n================================================\n");
-            logMsg.append("=================== 响应日志 ===================\n");
-            logMsg.append("================================================\n");
+            logMsg.append("\n========================================================================================\n");
+            logMsg.append("======================================= 响应日志 =======================================\n");
+            logMsg.append("========================================================================================\n");
             logMsg.append("Response Status: ").append(response.getStatus()).append("\n");
             logMsg.append("Content-Type: ").append(responseType).append("\n");
             logMsg.append("Response Body: \n").append(responseBody).append("\n");
             
-            logMsg.append("================================================\n");
-            logMsg.append("=================== 日志结束 ===================\n");
-            logMsg.append("================================================\n");
+            logMsg.append("========================================================================================\n");
+            logMsg.append("======================================= 日志结束 =======================================\n");
+            logMsg.append("========================================================================================\n");
             
             // 打印日志
             log.info(logMsg.toString());
