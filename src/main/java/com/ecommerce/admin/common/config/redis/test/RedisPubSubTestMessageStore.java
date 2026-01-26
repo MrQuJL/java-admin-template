@@ -1,4 +1,4 @@
-package com.ecommerce.admin.common.config.redis;
+package com.ecommerce.admin.common.config.redis.test;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

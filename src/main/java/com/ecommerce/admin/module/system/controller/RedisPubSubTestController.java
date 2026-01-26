@@ -1,6 +1,6 @@
 package com.ecommerce.admin.module.system.controller;
 
-import com.ecommerce.admin.common.config.redis.RedisPubSubTestMessageStore;
+import com.ecommerce.admin.common.config.redis.test.RedisPubSubTestMessageStore;
 import com.ecommerce.admin.common.result.Result;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

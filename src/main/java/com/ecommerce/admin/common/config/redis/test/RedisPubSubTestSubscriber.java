@@ -1,4 +1,4 @@
-package com.ecommerce.admin.common.config.redis;
+package com.ecommerce.admin.common.config.redis.test;
 
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;

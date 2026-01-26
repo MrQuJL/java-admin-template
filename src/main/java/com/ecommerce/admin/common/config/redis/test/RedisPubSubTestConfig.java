@@ -1,4 +1,4 @@
-package com.ecommerce.admin.common.config.redis;
+package com.ecommerce.admin.common.config.redis.test;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
