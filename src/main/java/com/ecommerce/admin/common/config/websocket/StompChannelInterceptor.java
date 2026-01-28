@@ -1,5 +1,6 @@
 package com.ecommerce.admin.common.config.websocket;
 
+import cn.dev33.satoken.stp.StpUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -45,8 +46,10 @@ public class StompChannelInterceptor implements ChannelInterceptor {
             }
 
             // 4. 执行实际的验证逻辑
-            // TODO: 在此处替换为真实的 Token 验证逻辑 (如 JWT 解析、Redis 查询)
-            if (!validateToken(token)) {
+            // 使用 Sa-Token 验证 Token
+            Object loginId = StpUtil.getLoginIdByToken(token);
+
+            if (loginId == null) {
                 log.error("WebSocket 连接失败: 无效的 Token -> {}", token);
                 throw new MessagingException("无效的 Token");
             }
@@ -56,15 +59,5 @@ public class StompChannelInterceptor implements ChannelInterceptor {
         }
         
         return message;
-    }
-
-    /**
-     * 简单的 Token 验证逻辑
-     * 实际项目中应替换为 JWT 校验或 Redis 校验
-     */
-    private boolean validateToken(String token) {
-        // 模拟验证：Token 必须不为空且长度大于 5
-        // 示例：允许 "123456" 或任何非空长字符串
-        return token != null && token.length() > 5;
     }
 }

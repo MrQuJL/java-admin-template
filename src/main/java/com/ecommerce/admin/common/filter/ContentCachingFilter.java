@@ -1,5 +1,7 @@
 package com.ecommerce.admin.common.filter;
 
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingRequestWrapper;
@@ -14,8 +16,8 @@ import java.io.IOException;
 /**
  * 内容缓存过滤器
  * 用于包装请求，支持多次读取请求体
+ * 注意：已在 FilterConfig 中统一配置，此处去除 @Component 注解
  */
-@Component
 public class ContentCachingFilter extends OncePerRequestFilter {
 
     @Override

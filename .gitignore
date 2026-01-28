@@ -89,6 +89,7 @@ generated/
 # Custom
 /target/
 /users.xlsx
+/uploads/
 
 # Editor & IDE
 .trae/

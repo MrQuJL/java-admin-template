@@ -33,6 +33,7 @@
         <jackson.version>2.13.5</jackson.version>
         <fastjson.version>2.0.25</fastjson.version>
         <knife4j.version>4.1.0</knife4j.version>
+        <x-file-storage.version>2.2.1</x-file-storage.version>
     </properties>
 
     <dependencies>
@@ -84,6 +85,20 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
+
+        <!-- Sa-Token 权限认证，在线文档：https://sa-token.cc -->
+        <dependency>
+            <groupId>cn.dev33</groupId>
+            <artifactId>sa-token-spring-boot-starter</artifactId>
+            <version>1.37.0</version>
+        </dependency>
+
+        <!-- Sa-Token 整合 Redis (使用 Jackson 序列化方式) -->
+        <dependency>
+            <groupId>cn.dev33</groupId>
+            <artifactId>sa-token-redis-jackson</artifactId>
+            <version>1.37.0</version>
         </dependency>
 
         <!-- 工具类依赖 -->
@@ -144,6 +159,13 @@
             <groupId>com.github.xiaoymin</groupId>
             <artifactId>knife4j-openapi2-spring-boot-starter</artifactId>
             <version>${knife4j.version}</version>
+        </dependency>
+
+        <!-- 文件存储 SDK https://x-file-storage.xuyanwu.cn/ -->
+        <dependency>
+            <groupId>org.dromara.x-file-storage</groupId>
+            <artifactId>x-file-storage-spring</artifactId>
+            <version>${x-file-storage.version}</version>
         </dependency>
     </dependencies>
 
